@@ -49,13 +49,20 @@ async def get_working_context(browser: Browser, proxies): # pragma: no cover
 
     return context
 
-async def get_html(context: BrowserContext, url: str) -> str: # pragma: no cover
+async def get_html(context: BrowserContext, url: str, retries: int = 3, delay: float = 1.0) -> str:  # pragma: no cover
     page = context.pages[0]
-    await page.goto(
-        url,
-        wait_until="domcontentloaded",
-    )
-    return await page.content()
+    for attempt in range(retries):
+        try:
+            await page.goto(url, wait_until="domcontentloaded", timeout=5000)
+            return await page.content()
+        except Error as e:
+            print(f"Attempt {attempt+1} failed: {e}")
+            if attempt < retries - 1:
+                await asyncio.sleep(delay)
+            else:
+                raise
+
+    return ""
 
 def parse_search_results(html_string: str):
     html_parser = html.fromstring(html_string)
