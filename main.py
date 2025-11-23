@@ -1,3 +1,4 @@
+import argparse
 import asyncio
 import json
 import sys
@@ -7,6 +8,16 @@ from urllib.parse import urlencode
 from lxml import html
 from playwright.async_api import async_playwright
 from playwright.async_api._generated import Browser, BrowserContext
+from playwright._impl._errors import Error
+
+if __name__ == "__main__": # pragma: no cover
+    # Absolute path to project root
+    project_root = Path(__file__).parent.resolve()
+    src_path = project_root / "src"
+
+    # Add src to PYTHONPATH only if not already present
+    if str(src_path) not in sys.path:
+        sys.path.insert(0, str(src_path))
 
 from json_validator import validate
 
@@ -96,7 +107,9 @@ def parse_extras(extra_html):
     return result
 
 async def main(): # pragma: no cover
-    json_data = validate(Path("input.json"))
+    json_path = Path(args.json_path)
+
+    json_data = validate(json_path)
     params = {
         "q": " ".join(json_data["keywords"]),
         "type": json_data["type"]
@@ -116,10 +129,34 @@ async def main(): # pragma: no cover
 
         await browser.close()
 
-    with open("output.json", "w") as f:
+    output_path = Path(args.output)
+    with open(output_path, "w") as f:
         json.dump(urls, f, indent=4)
 
     print(json.dumps(urls, indent=4))
 
-if __name__ == "__main__":
-    asyncio.run(main()) # pragma: no cover
+
+if __name__ == "__main__": # pragma: no cover
+    parser = argparse.ArgumentParser(
+        description="GitHub crawler that implements the GitHub search and returns all the links from the search result"
+    )
+
+    # required argument
+    parser.add_argument(
+        "json_path",
+        type=str,
+        help="Path to the input JSON file",
+    )
+
+    # optional argument
+    parser.add_argument(
+        "-o", "--output",
+        type=str,
+        default="output.json",
+        help=".json file to output",
+        required=False
+    )
+
+    args = parser.parse_args()
+
+    asyncio.run(main())
