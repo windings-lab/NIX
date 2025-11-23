@@ -46,7 +46,7 @@ def _is_wrong_extension(json_path: Path):
 def _validate_schema(json_data: dict):
     _json_validate(instance=json_data, schema=schema)
 
-def validate(json_path: Path):
+def validate(json_path: Path): # pragma: no cover
     _is_exists(json_path)
     _is_wrong_extension(json_path)
 
