@@ -13,5 +13,6 @@ dependencies = [
     "requests>=2.32.5",
 ]
 
-[pytest]
+[tool.pytest.ini_options]
 testpaths = ["tests"]
+pythonpath = ["src"]
