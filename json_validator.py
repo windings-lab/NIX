@@ -27,7 +27,7 @@ schema = {
         },
         "type": {
             "type": "string",
-            "enum": ["Repositories", "Wikis", "Issues"]
+            "enum": ["Repositories", "Wikis", "Issues", "repositories", "wikis", "issues"]
         }
     },
     "required": ["keywords", "proxies", "type"],
